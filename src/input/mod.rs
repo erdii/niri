@@ -184,13 +184,18 @@ impl State {
                 }
 
                 if device.has_capability(input::DeviceCapability::Keyboard) {
-                    if let Some(led_state) = self
-                        .niri
-                        .seat
-                        .get_keyboard()
-                        .map(|keyboard| keyboard.led_state())
-                    {
-                        device.led_update(led_state.into());
+                    if let Some(keyboard) = self.niri.seat.get_keyboard() {
+                        device.led_update(keyboard.led_state().into());
+
+                        if self.niri.config.borrow().input.keyboard.xkb.numlock {
+                            let mut modifier_state = keyboard.modifier_state();
+                            // TODO: what is the idiomatic way of enabling num lock here?
+                            // Probably setting this bool and then serializing the modifier state instead of hardcoding a magic number?
+                            // How can I serialize modifier_state?
+                            // modifier_state.num_lock = true;
+                            modifier_state.serialized.locked |= 1 << 4;
+                            keyboard.set_modifier_state(modifier_state);
+                        }
                     }
                 }
 

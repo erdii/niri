@@ -145,6 +145,8 @@ pub struct Xkb {
     pub options: Option<String>,
     #[knuffel(child, unwrap(argument))]
     pub file: Option<String>,
+    #[knuffel(child)]
+    pub numlock: bool,
 }
 
 impl Xkb {
